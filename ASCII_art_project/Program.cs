@@ -126,6 +126,7 @@ namespace ASCII_art_project
                 }
             }
 
+
             imageContainer.colours = colors;
             return imageContainer;
         }
