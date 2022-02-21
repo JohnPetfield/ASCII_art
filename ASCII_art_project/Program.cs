@@ -20,6 +20,7 @@ namespace ASCII_art_project
 
             //string s = @"C:\Users\johnm\source\repos\ASCII_art_solution\images\test3.jpg";
             string s = @"C:\Users\johnm\source\repos\ASCII_art_solution\images\ted1.jpg";
+            //string s = @"C:\Users\johnm\source\repos\ASCII_art_solution\images\bear2.jpg";
             //string s = @"C:\Users\johnm\source\repos\ASCII_art_solution\images\test2.jpg";
             //string s = @"C:\Users\johnm\source\repos\ASCII_art_solution\images\test1.jpg";
             //string s = @"C:\Users\johnm\source\repos\ASCII_art_solution\images\testdogs.jpg";
@@ -33,35 +34,42 @@ namespace ASCII_art_project
 
             Console.WriteLine($"width: {i.Width} height: {i.Height}");
 
-            int min= 0, max = 255;
-            List<Color> ColourArray = GetColourArray(i, ref min, ref max);
+            //List<Color> ColourArray = GetColourArray(i);
+
+            ImageContainer imageContainer = GetColourArray(i);
+
+            Console.WriteLine($"min colour {imageContainer.max} max colour {imageContainer.max}");
 
             int widthCount = 0;
 
             List<string> output = new();
             string line = "";
 
-            foreach(Color c in ColourArray)
+            foreach(Color c in imageContainer.colours)
             {
                 widthCount++;
 
                 int greyScaleColour = (c.R + c.G + c.B) / 3;
 
                 double index = 0;
-                /*if(inverted)
-                    index = Math.Floor(Map(greyScaleColour, 0, 255,  density.Length - 1, 0));
-                else
-                    index = Math.Floor(Map(greyScaleColour, 0, 255, 0, density.Length - 1));
-                */
-
+                
                 if(inverted)
                     index = Math.Floor(Map(greyScaleColour, 0, 255,  density.Length - 1, 0));
                 else
                     index = Math.Floor(Map(greyScaleColour, 0, 255, 0, density.Length - 1));
                 
 
+                /*
+                if(inverted)
+                    index = Math.Floor(Map(greyScaleColour, imageContainer.min, imageContainer.max,  density.Length - 1, 0));
+                else
+                    index = Math.Floor(Map(greyScaleColour, imageContainer.min, imageContainer.max, 0, density.Length - 1));
+                */
+
                 //string charToAdd = density[(int)index] == ' ' ? "&nbsp" : density[(int)index];
                 //line += density[(int)index];
+
+                //Console.WriteLine((int)index);
                 line += density[(int)index] == ' ' ? "&nbsp" : density[(int)index];
 
                 if (widthCount == i.Width)
@@ -93,10 +101,11 @@ namespace ASCII_art_project
             return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
         }
 
-        static public List<Color> GetColourArray(Image sourceImage, ref int min, ref int max)
+        static public ImageContainer GetColourArray(Image sourceImage)
         {
-        /// xhttps://social.msdn.microsoft.com/Forums/vstudio/en-US/ad60ec35-fe58-4d76-aa91-8da57e3abeff/how-to-get-rgb-array-from-an-systemdrawingimage-on-c?forum=csharpgeneral
+            /// xhttps://social.msdn.microsoft.com/Forums/vstudio/en-US/ad60ec35-fe58-4d76-aa91-8da57e3abeff/how-to-get-rgb-array-from-an-systemdrawingimage-on-c?forum=csharpgeneral
             List<Color> colors = new List<Color>();
+            ImageContainer imageContainer = new();
 
             using (Bitmap bmp = new Bitmap(sourceImage))
             using (Bitmap redBmp = new Bitmap(sourceImage.Width, sourceImage.Height))
@@ -109,14 +118,17 @@ namespace ASCII_art_project
 
                         colors.Add(pxl);
 
-                        //Color redPxl = Color.FromArgb(pxl.R, 0, 0);
-                        //redBmp.SetPixel(x, y, redPxl);
+                        // this is done twice and is lazy
+                        int greyScaleColour = (pxl.R + pxl.G + pxl.B) / 3;
+                        imageContainer.min = Math.Min(imageContainer.min, greyScaleColour);
+                        imageContainer.max = Math.Max(imageContainer.max, greyScaleColour);
                     }
                 }
             }
-            return colors;
-        }
 
+            imageContainer.colours = colors;
+            return imageContainer;
+        }
 
     }
 }
