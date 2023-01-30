@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace ASCII_art_project
 {
@@ -13,13 +12,13 @@ namespace ASCII_art_project
         static void Main(string[] args)
         {
             const string density = "Ñ@#W$9876543210?!abc;:+=-,._ ";
-            string s = @"C:\Users\johnm\source\repos\ASCII_art_solution\images\bear1.jpg";
+            string filePath = @"C:\Users\johnm\source\repos\ASCII_art_solution\images\bear1.jpg";
 
             bool inverted = false;
 
-            Image i = Image.FromFile(s);
+            Image image = Image.FromFile(filePath);
 
-            ImageContainer imageContainer = GetColourArray(i);
+            ImageContainer imageContainer = GetColourArray(image);
 
             int widthCount = 0;
 
@@ -41,7 +40,7 @@ namespace ASCII_art_project
 
                 line += density[(int)index] == ' ' ? "&nbsp" : density[(int)index];
 
-                if (widthCount == i.Width)
+                if (widthCount == image.Width)
                 {
                     line += "<br>";
                     widthCount = 0;
